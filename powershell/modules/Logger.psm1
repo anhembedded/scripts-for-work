@@ -7,14 +7,14 @@ function Write-Log {
     The message to log
     
     .PARAMETER Level
-    Log level: INFO, WARNING, ERROR
+    Log level: INFO, SUCCESS, WARNING, ERROR
     #>
     param(
         [Parameter(Mandatory=$true)]
         [string]$Message,
         
         [Parameter(Mandatory=$false)]
-        [ValidateSet('INFO','WARNING','ERROR')]
+        [ValidateSet('INFO','SUCCESS','WARNING','ERROR')]
         [string]$Level = 'INFO'
     )
     
@@ -24,6 +24,7 @@ function Write-Log {
     # Color coding
     switch ($Level) {
         'INFO'    { Write-Host $logMessage -ForegroundColor Green }
+        'SUCCESS' { Write-Host $logMessage -ForegroundColor Cyan }
         'WARNING' { Write-Host $logMessage -ForegroundColor Yellow }
         'ERROR'   { Write-Host $logMessage -ForegroundColor Red }
     }
