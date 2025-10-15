@@ -1,0 +1,20 @@
+{
+  "general": {
+    "log_level": "INFO",
+    "log_directory": "logs",
+    "temp_directory": "temp"
+  },
+  "notifications": {
+    "enabled": false,
+    "email": {
+      "smtp_server": "smtp.example.com",
+      "smtp_port": 587,
+      "from_address": "your-email@example.com"
+    }
+  },
+  "paths": {
+    "input_directory": "input",
+    "output_directory": "output",
+    "backup_directory": "backup"
+  }
+}

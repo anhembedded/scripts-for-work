@@ -1,0 +1,16 @@
+# Common automation libraries
+requests>=2.31.0
+python-dotenv>=1.0.0
+PyYAML>=6.0.1
+click>=8.1.7
+
+# File operations
+openpyxl>=3.1.2
+pandas>=2.1.0
+
+# System utilities
+psutil>=5.9.0
+schedule>=1.2.0
+
+# Logging and monitoring
+loguru>=0.7.0
