@@ -1,0 +1,70 @@
+@startuml sequence-conversion
+title UML to SVG Conversion Sequence
+
+actor User
+participant "Convert-UmlToSvg.ps1" as Main
+participant "DependencyManager" as DepMgr
+participant "UmlConverter" as Converter
+participant "Java Process" as Java
+participant "PlantUML JAR" as PlantUML
+participant "FileSystem" as FS
+
+User -> Main: .\Convert-UmlToSvg.ps1 -Path "examples" -Out "output" -Force
+activate Main
+
+' Step 1: Verify dependencies
+Main -> DepMgr: Test-Dependencies()
+activate DepMgr
+DepMgr -> FS: Check Java
+DepMgr -> FS: Check PlantUML
+DepMgr -> FS: Check Graphviz
+DepMgr --> Main: All dependencies [OK]
+deactivate DepMgr
+
+' Step 2: Find input files
+Main -> FS: Get-ChildItem -Filter *.puml -Recurse
+FS --> Main: 5 .puml files found
+
+' Step 3: Convert each file
+Main -> Converter: Convert-UmlToSvg(Path, OutputPath, Force)
+activate Converter
+
+loop For each .puml file
+    Converter -> FS: Read input file path
+    Converter -> Converter: Convert OutputPath to absolute
+    
+    Converter -> Java: Detect Java at %USERPROFILE%\.java\jdk\bin\java.exe
+    Java --> Converter: Found
+    
+    Converter -> Converter: Build command:\njava -jar plantuml.jar -tsvg -o <output> <input>
+    
+    Converter -> Java: Start-Process with arguments
+    activate Java
+    Java -> PlantUML: Execute JAR with parameters
+    activate PlantUML
+    PlantUML -> FS: Read .puml file
+    PlantUML -> PlantUML: Parse PlantUML syntax
+    PlantUML -> PlantUML: Generate SVG content
+    PlantUML -> FS: Write .svg file
+    PlantUML --> Java: Exit code 0
+    deactivate PlantUML
+    Java --> Converter: Process completed
+    deactivate Java
+    
+    Converter -> FS: Verify output file exists
+    FS --> Converter: File created successfully
+    Converter -> Converter: SuccessCount++
+end
+
+Converter --> Main: Result { SuccessCount: 5, FailureCount: 0, OutputFiles: [...] }
+deactivate Converter
+
+' Step 4: Display results
+Main -> User: "Conversion completed: 5 succeeded, 0 failed"
+Main -> FS: Get file information
+FS --> Main: File names and sizes
+Main -> User: Display generated files:\n  - activity-example.svg (16,369 bytes)\n  - class-example.svg (28,467 bytes)\n  - component-example.svg (32,741 bytes)\n  - sequence-example.svg (11,550 bytes)\n  - usecase-example.svg (19,057 bytes)
+
+deactivate Main
+
+@enduml

@@ -1,0 +1,67 @@
+@startuml component-example
+' Component Diagram Example
+
+title Microservices Architecture
+
+!include <C4/C4_Component>
+
+package "Frontend Layer" {
+    component [Web Application] as WebApp
+    component [Mobile App] as MobileApp
+}
+
+package "API Gateway Layer" {
+    component [API Gateway] as Gateway
+    component [Load Balancer] as LB
+}
+
+package "Microservices" {
+    component [User Service] as UserService
+    component [Product Service] as ProductService
+    component [Order Service] as OrderService
+    component [Payment Service] as PaymentService
+    component [Notification Service] as NotificationService
+}
+
+package "Data Layer" {
+    database "User DB" as UserDB
+    database "Product DB" as ProductDB
+    database "Order DB" as OrderDB
+    queue "Message Queue" as MQ
+    component [Cache (Redis)] as Cache
+}
+
+package "External Services" {
+    component [Payment Gateway] as PaymentGW
+    component [Email Service] as EmailService
+    component [SMS Service] as SMSService
+}
+
+' Connections
+WebApp --> LB : HTTPS
+MobileApp --> LB : HTTPS
+
+LB --> Gateway
+
+Gateway --> UserService : REST
+Gateway --> ProductService : REST
+Gateway --> OrderService : REST
+Gateway --> PaymentService : REST
+
+UserService --> UserDB
+UserService --> Cache
+
+ProductService --> ProductDB
+ProductService --> Cache
+
+OrderService --> OrderDB
+OrderService --> MQ : publish
+
+PaymentService --> PaymentGW
+PaymentService --> MQ : publish
+
+NotificationService --> MQ : subscribe
+NotificationService --> EmailService
+NotificationService --> SMSService
+
+@enduml

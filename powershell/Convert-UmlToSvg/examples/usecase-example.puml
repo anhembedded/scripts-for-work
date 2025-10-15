@@ -1,0 +1,58 @@
+@startuml usecase-example
+' Use Case Diagram Example
+
+title Online Shopping System
+
+left to right direction
+
+actor Customer
+actor "Guest User" as Guest
+actor Administrator as Admin
+actor "Payment Gateway" as Payment
+
+rectangle "Online Shopping System" {
+    usecase "Browse Products" as UC1
+    usecase "Search Products" as UC2
+    usecase "View Product Details" as UC3
+    usecase "Add to Cart" as UC4
+    usecase "Register Account" as UC5
+    usecase "Login" as UC6
+    usecase "Checkout" as UC7
+    usecase "Make Payment" as UC8
+    usecase "Track Order" as UC9
+    usecase "Manage Products" as UC10
+    usecase "Manage Orders" as UC11
+    usecase "View Reports" as UC12
+    usecase "Process Refund" as UC13
+}
+
+' Customer relationships
+Customer --> UC1
+Customer --> UC2
+Customer --> UC3
+Customer --> UC4
+Customer --> UC6
+Customer --> UC7
+Customer --> UC9
+
+' Guest relationships
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+Guest --> UC5
+
+' Admin relationships
+Admin --> UC10
+Admin --> UC11
+Admin --> UC12
+Admin --> UC13
+
+' System relationships
+UC7 ..> UC8 : includes
+UC8 --> Payment : uses
+
+' Extensions
+UC2 ..> UC3 : extends
+UC4 ..> UC7 : extends
+
+@enduml

@@ -1,0 +1,49 @@
+@startuml activity-example
+' Activity Diagram Example
+
+title Order Processing Workflow
+
+start
+
+:Receive Order;
+
+if (Stock Available?) then (yes)
+    :Reserve Items;
+    
+    :Calculate Total;
+    
+    if (Payment Successful?) then (yes)
+        :Confirm Order;
+        :Update Inventory;
+        
+        fork
+            :Send Confirmation Email;
+        fork again
+            :Notify Warehouse;
+        fork again
+            :Update Analytics;
+        end fork
+        
+        :Package Items;
+        :Ship Order;
+        :Update Order Status;
+        
+        stop
+    else (no)
+        :Cancel Reservation;
+        :Send Payment Failed Email;
+        stop
+    endif
+    
+else (no)
+    :Send Out of Stock Notification;
+    
+    if (Add to Waitlist?) then (yes)
+        :Add to Waitlist;
+        :Send Waitlist Confirmation;
+    endif
+    
+    stop
+endif
+
+@enduml

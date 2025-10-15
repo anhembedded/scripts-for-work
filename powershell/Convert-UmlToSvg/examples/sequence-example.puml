@@ -1,0 +1,33 @@
+@startuml sequence-example
+' Simple Sequence Diagram Example
+
+title User Authentication Flow
+
+actor User
+participant "Web App" as Web
+participant "Auth Service" as Auth
+database "User DB" as DB
+
+User -> Web: Enter credentials
+activate Web
+
+Web -> Auth: Validate credentials
+activate Auth
+
+Auth -> DB: Query user
+activate DB
+DB --> Auth: User data
+deactivate DB
+
+alt Credentials valid
+    Auth --> Web: Auth token
+    Web --> User: Login success
+else Invalid credentials
+    Auth --> Web: Error
+    Web --> User: Login failed
+end
+
+deactivate Auth
+deactivate Web
+
+@enduml

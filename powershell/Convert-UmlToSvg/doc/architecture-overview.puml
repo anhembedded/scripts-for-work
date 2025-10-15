@@ -1,0 +1,103 @@
+@startuml architecture-overview
+!define RECTANGLE class
+
+title Convert-UmlToSvg - System Architecture Overview
+
+package "Convert-UmlToSvg.ps1" {
+    [Main Script] as Main
+    note right of Main
+        Entry point with parameter validation
+        • CmdletBinding with parameter sets
+        • Dependency verification
+        • Error handling and logging
+    end note
+}
+
+package "modules/" {
+    [DependencyManager.psm1] as DepMgr
+    [UmlConverter.psm1] as Converter
+    [Logger.psm1] as Logger
+    
+    note right of DepMgr
+        Dependency management
+        • Test-Dependencies
+        • Install-Java (portable download)
+        • Install-PlantUML (JAR download)
+        • Install-Graphviz (winget)
+        • Get-PlantUmlPath
+    end note
+    
+    note right of Converter
+        Conversion operations
+        • Convert-UmlToSvg
+        • Test-PlantUmlSyntax
+        • Invoke-PlantUmlRaw
+    end note
+}
+
+package "External Dependencies" {
+    [Java JRE 17.0] as Java
+    [PlantUML JAR] as PlantUML
+    [Graphviz 14.0.1] as Graphviz
+    
+    note right of Java
+        Microsoft OpenJDK portable
+        Location: %USERPROFILE%\.java\jdk
+        Auto-downloaded from MS
+    end note
+    
+    note right of PlantUML
+        Latest PlantUML JAR (24.08 MB)
+        Location: %USERPROFILE%\.plantuml
+        Auto-downloaded from GitHub
+    end note
+    
+    note right of Graphviz
+        Graph visualization
+        Location: C:\Program Files\Graphviz
+        Auto-installed via winget
+    end note
+}
+
+package "Input/Output" {
+    folder "examples/" as Examples {
+        file "*.puml" as PumlFiles
+    }
+    
+    folder "output/" as Output {
+        file "*.svg" as SvgFiles
+    }
+    
+    folder "logs/" as Logs {
+        file "*.log" as LogFiles
+    }
+}
+
+package "Testing" {
+    [Convert-UmlToSvg.Tests.ps1] as Tests
+    note right of Tests
+        Pester 3.4.0 tests
+        • 11 unit tests
+        • 100% pass rate
+        • 870ms execution
+    end note
+}
+
+' Relationships
+Main --> DepMgr : imports
+Main --> Converter : imports
+Main --> Logger : imports (optional)
+DepMgr --> Java : manages
+DepMgr --> PlantUML : manages
+DepMgr --> Graphviz : manages
+Converter --> Java : executes
+Converter --> PlantUML : uses JAR
+Converter --> Graphviz : indirect (PlantUML uses)
+Main --> PumlFiles : reads
+Converter --> SvgFiles : generates
+Main --> LogFiles : writes
+Tests --> Main : validates
+Tests --> DepMgr : validates
+Tests --> Converter : validates
+
+@enduml

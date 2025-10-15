@@ -1,0 +1,129 @@
+@startuml activity-workflow
+title Convert-UmlToSvg - Complete Workflow
+
+|User|
+start
+:Execute Convert-UmlToSvg.ps1
+with parameters;
+
+|Script|
+:Parse and validate
+command-line parameters;
+
+if (Check mode?) then (yes)
+    |DependencyManager|
+    :Test-Dependencies();
+    :Check Java installation;
+    :Check PlantUML JAR;
+    :Check Graphviz installation;
+    
+    if (Download flag?) then (yes)
+        :Install-Dependencies();
+        
+        :Install-PlantUML()
+        - Download JAR from GitHub
+        - Save to %USERPROFILE%\.plantuml;
+        
+        :Install-Java()
+        - Download MS OpenJDK 17 ZIP
+        - Extract to %USERPROFILE%\.java\jdk
+        - Add to PATH;
+        
+        :Install-Graphviz()
+        - Run winget install
+        - Verify installation;
+    endif
+    
+    :Display dependency status;
+    stop
+endif
+
+if (RawRun mode?) then (yes)
+    |UmlConverter|
+    :Invoke-PlantUmlRaw()
+    Execute raw PlantUML command;
+    stop
+endif
+
+if (Validate mode?) then (yes)
+    |UmlConverter|
+    :Test-PlantUmlSyntax();
+    :Run PlantUML -syntax mode;
+    :Display validation results;
+    stop
+endif
+
+' Conversion mode (default)
+|Script|
+:Verify all dependencies
+are installed;
+
+if (Dependencies OK?) then (no)
+    #pink:Display error message;
+    :Suggest running
+    -Check -Download;
+    stop
+endif
+
+|UmlConverter|
+:Convert-UmlToSvg();
+
+if (Input is file?) then (yes)
+    :Process single .puml file;
+else (directory)
+    :Find all .puml files
+    recursively;
+    
+    repeat
+        :Process next .puml file;
+        
+        :Convert output path
+        to absolute;
+        
+        :Detect Java executable
+        (local first, then PATH);
+        
+        :Build PlantUML command:
+        java -jar plantuml.jar
+        -tsvg -o <output> <input>;
+        
+        :Execute Java process;
+        
+        if (Conversion successful?) then (yes)
+            #lightgreen:SuccessCount++;
+            :Record output file;
+        else (failed)
+            #pink:FailureCount++;
+            :Record error;
+        endif
+        
+    repeat while (More files?) is (yes)
+    ->no;
+endif
+
+:Return conversion results;
+
+|Script|
+:Display summary:
+X succeeded, Y failed;
+
+:List all generated
+SVG files with sizes;
+
+if (Preview mode?) then (yes)
+    :Open SVG files
+    in default browser;
+endif
+
+if (Verbose mode?) then (yes)
+    :Write detailed logs
+    to log file;
+endif
+
+|User|
+:View generated
+SVG files;
+
+stop
+
+@enduml

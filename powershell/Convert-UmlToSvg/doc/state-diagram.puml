@@ -1,0 +1,111 @@
+@startuml state-diagram
+title Convert-UmlToSvg - Dependency State Machine
+
+[*] --> Uninitialized
+
+state Uninitialized {
+    [*] --> CheckingDependencies
+    CheckingDependencies : Check Java, PlantUML, Graphviz
+    CheckingDependencies : Look in local paths first
+    CheckingDependencies : Then check system PATH
+}
+
+state DependencyStatus {
+    state "All Dependencies OK" as AllOK
+    state "Some Missing" as SomeMissing
+    state "All Missing" as AllMissing
+    
+    Uninitialized --> AllOK : All found
+    Uninitialized --> SomeMissing : 1-2 missing
+    Uninitialized --> AllMissing : All missing
+}
+
+state InstallingDependencies {
+    state "Download PlantUML" as DownloadPlantUML {
+        [*] --> CreatingDirectory
+        CreatingDirectory --> DownloadingJAR : mkdir success
+        DownloadingJAR --> SavingJAR : download complete
+        SavingJAR --> [*] : file saved
+    }
+    
+    state "Install Java" as InstallJava {
+        [*] --> DownloadingZIP
+        DownloadingZIP --> ExtractingZIP : download complete
+        ExtractingZIP --> UpdatingPATH : extract complete
+        UpdatingPATH --> [*] : PATH updated
+    }
+    
+    state "Install Graphviz" as InstallGraphviz {
+        [*] --> TryingWinget
+        TryingWinget --> VerifyingInstall : winget success
+        TryingWinget --> TryingDownload : winget failed
+        TryingDownload --> ManualInstall : download failed
+        VerifyingInstall --> [*] : verified
+        ManualInstall --> [*] : user installs
+    }
+}
+
+SomeMissing --> InstallingDependencies : -Check -Download
+AllMissing --> InstallingDependencies : -Check -Download
+
+InstallingDependencies --> AllOK : All installed
+
+state ConversionReady {
+    AllOK --> ValidatingInput
+    ValidatingInput : Check .puml files exist
+    ValidatingInput : Validate paths
+    
+    ValidatingInput --> ConvertingFiles : validation OK
+    ValidatingInput --> ErrorState : validation failed
+    
+    state ConvertingFiles {
+        [*] --> ProcessingFile
+        ProcessingFile --> ExecutingJava
+        ExecutingJava --> GeneratingSVG
+        GeneratingSVG --> VerifyingOutput
+        VerifyingOutput --> ProcessingFile : more files
+        VerifyingOutput --> [*] : all done
+    }
+    
+    ConvertingFiles --> ConversionComplete : all files processed
+}
+
+state ConversionComplete {
+    [*] --> DisplayingSummary
+    DisplayingSummary : Show success/failure counts
+    DisplayingSummary : List generated files
+    DisplayingSummary : Display file sizes
+    
+    DisplayingSummary --> PreviewingSVG : -Preview flag
+    DisplayingSummary --> WritingLogs : -Verbose flag
+    DisplayingSummary --> [*] : done
+    
+    PreviewingSVG --> [*]
+    WritingLogs --> [*]
+}
+
+ConversionComplete --> [*]
+
+state ErrorState {
+    [*] --> LoggingError
+    LoggingError --> DisplayingErrorMessage
+    DisplayingErrorMessage --> [*]
+}
+
+ErrorState --> [*]
+
+note right of InstallingDependencies
+    PlantUML: ~24 MB download
+    Java: ~200 MB download
+    Graphviz: winget install
+end note
+
+note right of ConvertingFiles
+    For each .puml file:
+    1. Resolve absolute path
+    2. Detect local Java first
+    3. Execute: java -jar plantuml.jar -tsvg
+    4. Verify SVG created
+end note
+
+@enduml

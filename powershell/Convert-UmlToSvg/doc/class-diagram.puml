@@ -1,0 +1,151 @@
+@startuml class-diagram
+title Convert-UmlToSvg - Class/Module Structure
+
+package "Convert-UmlToSvg.ps1" <<Script>> {
+    class ConvertUmlToSvgScript {
+        + Parameters
+        --
+        + [string] Path
+        + [string] Out
+        + [switch] Check
+        + [switch] Download
+        + [string] RawRun
+        + [switch] Force
+        + [switch] Validate
+        + [switch] Preview
+        + [switch] Verbose
+        + [string] LogFile
+        --
+        + Main()
+        + ValidateParameters()
+        + HandleCheckMode()
+        + HandleConversionMode()
+        + HandleValidateMode()
+        + HandleRawRunMode()
+    }
+}
+
+package "DependencyManager.psm1" <<Module>> {
+    class DependencyManager {
+        - $DependenciesConfig : Hashtable
+        --
+        + Test-Dependencies() : Hashtable
+        + Install-Dependencies() : void
+        + Install-Java() : void
+        + Install-PlantUML() : void
+        + Install-Graphviz() : void
+        + Get-PlantUmlPath() : string
+        --
+        - CheckJavaInstallation() : bool
+        - CheckPlantUMLInstallation() : bool
+        - CheckGraphvizInstallation() : bool
+        - DownloadFile(url, path) : void
+        - ExtractZip(source, dest) : void
+    }
+    
+    class DependencyConfig {
+        + Name : string
+        + MinVersion : string
+        + DownloadUrl : string
+        + DownloadUrlAlt : string
+        + TestCommand : string
+        + TestArgs : string
+        + VersionRegex : string
+        + LocalPath : string
+        + FileName : string
+    }
+}
+
+package "UmlConverter.psm1" <<Module>> {
+    class UmlConverter {
+        + Convert-UmlToSvg(Path, OutputPath, Force) : Hashtable
+        + Test-PlantUmlSyntax(Path) : Hashtable
+        + Invoke-PlantUmlRaw(RawArgs) : void
+        --
+        - ProcessSingleFile(file, output) : bool
+        - ProcessDirectory(dir, output) : Hashtable
+        - ExecutePlantUML(args) : int
+        - OpenSvgFile(path) : void
+    }
+    
+    class ConversionResult {
+        + SuccessCount : int
+        + FailureCount : int
+        + OutputFiles : string[]
+        + Errors : string[]
+    }
+    
+    class ValidationResult {
+        + IsValid : bool
+        + FileCount : int
+        + Errors : string[]
+    }
+}
+
+package "Logger.psm1" <<Module>> {
+    class Logger {
+        + Write-Log(Message, Level) : void
+        + Initialize-LogFile(Path) : void
+        - FormatLogMessage(Message, Level) : string
+    }
+}
+
+package "External Dependencies" <<System>> {
+    class JavaRuntime {
+        + Version : string
+        + ExecutablePath : string
+        --
+        + Execute(jarPath, args) : int
+    }
+    
+    class PlantUMLJar {
+        + Version : string
+        + JarPath : string
+        --
+        + Convert(inputPath, outputPath, format) : void
+        + ValidateSyntax(inputPath) : bool
+        + GetVersion() : string
+    }
+    
+    class Graphviz {
+        + Version : string
+        + DotExecutable : string
+        --
+        + RenderGraph(input) : void
+    }
+}
+
+' Relationships
+ConvertUmlToSvgScript --> DependencyManager : uses
+ConvertUmlToSvgScript --> UmlConverter : uses
+ConvertUmlToSvgScript --> Logger : uses
+
+DependencyManager --> DependencyConfig : manages
+DependencyManager --> JavaRuntime : checks/installs
+DependencyManager --> PlantUMLJar : checks/installs
+DependencyManager --> Graphviz : checks/installs
+
+UmlConverter --> ConversionResult : returns
+UmlConverter --> ValidationResult : returns
+UmlConverter --> DependencyManager : uses
+UmlConverter --> JavaRuntime : executes
+UmlConverter --> PlantUMLJar : invokes
+
+PlantUMLJar --> JavaRuntime : requires
+PlantUMLJar --> Graphviz : uses (optional)
+
+note right of DependencyManager
+    Multi-path detection:
+    1. Local installations
+       (%USERPROFILE%\.java, etc.)
+    2. System PATH
+    3. Program Files
+end note
+
+note right of UmlConverter
+    Absolute path resolution:
+    Uses GetUnresolvedProviderPathFromPSPath
+    for reliable path handling
+end note
+
+@enduml

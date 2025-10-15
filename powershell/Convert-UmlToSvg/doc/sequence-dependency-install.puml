@@ -1,0 +1,74 @@
+@startuml sequence-dependency-install
+title Dependency Installation Sequence (Test Case 2)
+
+actor User
+participant "Convert-UmlToSvg.ps1" as Main
+participant "DependencyManager" as DepMgr
+participant "FileSystem" as FS
+participant "Winget" as Winget
+participant "WebClient" as Web
+
+User -> Main: .\Convert-UmlToSvg.ps1 -Check -Download
+activate Main
+
+Main -> DepMgr: Test-Dependencies()
+activate DepMgr
+DepMgr -> FS: Check Java at %USERPROFILE%\.java\jdk\bin\java.exe
+FS --> DepMgr: [MISSING]
+DepMgr -> FS: Check PlantUML at %USERPROFILE%\.plantuml\plantuml.jar
+FS --> DepMgr: [MISSING]
+DepMgr -> FS: Check Graphviz at C:\Program Files\Graphviz\bin\dot.exe
+FS --> DepMgr: [MISSING]
+DepMgr --> Main: { Java: false, PlantUML: false, Graphviz: false }
+deactivate DepMgr
+
+Main -> Main: Display missing dependencies
+Main -> User: "Installing dependencies..."
+
+Main -> DepMgr: Install-Dependencies()
+activate DepMgr
+
+' Install PlantUML
+DepMgr -> DepMgr: Install-PlantUML()
+activate DepMgr
+DepMgr -> FS: Create directory %USERPROFILE%\.plantuml
+DepMgr -> Web: Download plantuml.jar from GitHub
+Web --> DepMgr: plantuml.jar (24.08 MB)
+DepMgr -> FS: Save to %USERPROFILE%\.plantuml\plantuml.jar
+FS --> DepMgr: Success
+DepMgr -> User: "✓ PlantUML installed"
+deactivate DepMgr
+
+' Install Java
+DepMgr -> DepMgr: Install-Java()
+activate DepMgr
+DepMgr -> FS: Create directory %USERPROFILE%\.java
+DepMgr -> Web: Download Microsoft OpenJDK 17 ZIP
+Web --> DepMgr: jdk-17.0.9.zip (~200 MB)
+DepMgr -> FS: Extract to %USERPROFILE%\.java\jdk
+DepMgr -> DepMgr: Add to $env:PATH
+DepMgr -> User: "✓ Java 17.0 installed"
+deactivate DepMgr
+
+' Install Graphviz
+DepMgr -> DepMgr: Install-Graphviz()
+activate DepMgr
+DepMgr -> Winget: winget install Graphviz.Graphviz --silent
+Winget --> DepMgr: Installation success
+DepMgr -> User: "✓ Graphviz 14.0.1 installed"
+deactivate DepMgr
+
+deactivate DepMgr
+
+Main -> DepMgr: Test-Dependencies()
+activate DepMgr
+DepMgr -> FS: Verify all installations
+FS --> DepMgr: All [OK]
+DepMgr --> Main: { Java: true, PlantUML: true, Graphviz: true }
+deactivate DepMgr
+
+Main -> User: "All dependencies installed successfully!"
+Main -> User: Display status:\n Java: [OK]\n PlantUML: [OK]\n Graphviz: [OK]
+deactivate Main
+
+@enduml

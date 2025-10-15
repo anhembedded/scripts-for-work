@@ -1,0 +1,56 @@
+# Ignore logs directory and log files
+logs/
+*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+~$*
+
+# Ignore test output files (keep examples)
+test-*.puml
+test-*.svg
+
+# Ignore PowerShell execution policy bypass files
+*.ps1.bak
+
+# Ignore dependency downloads (will be auto-installed)
+*.jar.download
+*.zip.download
+
+# Ignore local user configurations
+.user.config
+local.settings.json
+
+# Ignore VS Code workspace settings (keep folder settings)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Ignore OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Ignore backup files
+*.bak
+*~
+
+# Ignore all generated SVG files (can be regenerated from .puml)
+*.svg
+
+# Exception: Keep a few example SVGs for demonstration (optional)
+# Uncomment the lines below if you want to commit example outputs:
+# !examples/output/sequence-example.svg
+# !output/sequence-example.svg
+
+# Ignore output directory contents
+output/*
+
+# Ignore downloaded dependencies (will be auto-installed)
+# These are installed to user profile, not project directory
+# But listed here for reference
+# %USERPROFILE%\.plantuml/
+# %USERPROFILE%\.java/

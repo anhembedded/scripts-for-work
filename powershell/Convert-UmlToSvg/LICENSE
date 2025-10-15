@@ -1,0 +1,59 @@
+MIT License
+
+Copyright (c) 2025 anhembedded
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Third-Party Software
+
+This project uses the following third-party software:
+
+### PlantUML
+- License: GPL-3.0 / Apache-2.0 / MIT (multiple licensing)
+- URL: https://plantuml.com/
+- Description: Diagram generation tool
+
+### Java Runtime Environment (Microsoft OpenJDK)
+- License: GPL-2.0 with Classpath Exception
+- URL: https://www.microsoft.com/openjdk
+- Description: Java runtime for PlantUML execution
+
+### Graphviz
+- License: Eclipse Public License 1.0
+- URL: https://graphviz.org/
+- Description: Graph visualization software
+
+### Pester (Testing Framework)
+- License: Apache-2.0
+- URL: https://pester.dev/
+- Description: PowerShell testing framework
+
+---
+
+## Attribution
+
+This software includes or depends on:
+- PlantUML for diagram generation
+- Java Runtime Environment for PlantUML execution
+- Graphviz for graph rendering
+- Pester for automated testing
+
+All trademarks are the property of their respective owners.

@@ -1,0 +1,77 @@
+@startuml class-example
+' Class Diagram Example
+
+title E-Commerce System Classes
+
+package "Domain Models" {
+    class User {
+        -id: UUID
+        -username: String
+        -email: String
+        -passwordHash: String
+        --
+        +register(): void
+        +login(): boolean
+        +updateProfile(): void
+    }
+
+    class Product {
+        -id: UUID
+        -name: String
+        -description: String
+        -price: Decimal
+        -stock: Integer
+        --
+        +updateStock(amount: Integer): void
+        +getPrice(): Decimal
+        +isAvailable(): boolean
+    }
+
+    class Order {
+        -id: UUID
+        -orderDate: DateTime
+        -status: OrderStatus
+        -totalAmount: Decimal
+        --
+        +addItem(item: OrderItem): void
+        +removeItem(itemId: UUID): void
+        +calculateTotal(): Decimal
+        +updateStatus(status: OrderStatus): void
+    }
+
+    class OrderItem {
+        -id: UUID
+        -quantity: Integer
+        -unitPrice: Decimal
+        --
+        +getSubtotal(): Decimal
+    }
+
+    class ShoppingCart {
+        -id: UUID
+        -createdAt: DateTime
+        --
+        +addProduct(product: Product, quantity: Integer): void
+        +removeProduct(productId: UUID): void
+        +clear(): void
+        +checkout(): Order
+    }
+}
+
+enum OrderStatus {
+    PENDING
+    PROCESSING
+    SHIPPED
+    DELIVERED
+    CANCELLED
+}
+
+' Relationships
+User "1" -- "0..*" Order : places >
+User "1" -- "1" ShoppingCart : has >
+Order "1" *-- "1..*" OrderItem : contains >
+OrderItem "0..*" -- "1" Product : references >
+ShoppingCart "1" o-- "0..*" Product : contains >
+Order -- OrderStatus
+
+@enduml
